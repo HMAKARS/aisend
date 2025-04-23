@@ -1,4 +1,4 @@
-# DayTrip - 여행 코스 공유 앱
+# aisend - 여행 코스 공유 앱
 
 플러터로 개발된 여행 코스 공유 및 검색 애플리케이션입니다.
 
@@ -8,8 +8,8 @@
 
 1. 프로젝트를 클론합니다.
 ```
-git clone https://github.com/yourusername/daytrip_app.git
-cd daytrip_app
+git clone https://github.com/yourusername/aisend_app.git
+cd aisend_app
 ```
 
 2. 의존성 패키지를 설치합니다.

@@ -1,4 +1,4 @@
-package com.example.daytrip_app
+package com.example.aisend_app
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.daytrip_app"
+    namespace = "com.example.aisend_app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.daytrip_app"
+        applicationId = "com.example.aisend_app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         // 카카오맵 SDK 요구사항에 맞춤 (최소 API 레벨 19)

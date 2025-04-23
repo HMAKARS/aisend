@@ -1,6 +1,6 @@
 {
-    "name": "daytrip_app",
-    "short_name": "daytrip_app",
+    "name": "aisend_app",
+    "short_name": "aisend_app",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
