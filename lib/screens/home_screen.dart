@@ -1,10 +1,25 @@
 import 'package:flutter/material.dart';
 import '../models/trip.dart';
-import '../widgets/trip_type_card.dart';
+import '../widgets/trip_card.dart';
 import 'dart:ui';
+import 'trip_detail_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  // 현재 날씨 (실제로는 API 연동 필요)
+  final String currentWeather = '맑음'; // 예: 맑음, 비, 눈, 흐림 등
+
+  // 선택된 테마 인덱스
+  int _selectedThemeIndex = 0;
+
+  // 테마 리스트
+  final List<String> themes = ['전체', '힐링', '액티비티', '역사', '맛집', '카페'];
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +97,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
 
-            // 여행 타입 선택 섹션
+            // 날씨 기반 추천 여행 섹션
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 30, 20, 10),
@@ -95,70 +110,229 @@ class HomeScreen extends StatelessWidget {
                           width: 5,
                           height: 25,
                           decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor,
+                            color: Theme
+                                .of(context)
+                                .primaryColor,
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                         const SizedBox(width: 10),
-                        Text(
-                          '누구와 함께 여행할까요?',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        Row(
+                          children: [
+                            _getWeatherIcon(currentWeather),
+                            const SizedBox(width: 8),
+                            Text(
+                              '$currentWeather 날씨에 딱 맞는 여행',
+                              style: Theme
+                                  .of(context)
+                                  .textTheme
+                                  .titleLarge
+                                  ?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      '함께하는 사람에 맞는 여행 코스를 추천해드려요',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
-                          ),
+                      '오늘같은 날씨에 즐기기 좋은 여행 코스를 추천해드려요',
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(
+                        color: Colors.grey[600],
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
 
-            // 여행 타입 카드 그리드
+            // 날씨 기반 추천 여행 카드 목록
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              sliver: SliverGrid(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 15.0,
-                  crossAxisSpacing: 15.0,
-                  childAspectRatio: 1.1,
+              sliver: SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 215,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: <Widget>[
+                      _buildWeatherBasedTripCard(
+                        context,
+                        '서울 실내 데이트 코스',
+                        '미술관, 카페, 맛집을 즐기는 코스',
+                        '4시간 코스',
+                        'https://picsum.photos/300/200?random=11',
+                        4.7,
+                        '1', // 임시 ID
+                      ),
+                      _buildWeatherBasedTripCard(
+                        context,
+                        '청계천 산책 코스',
+                        '도심 속 자연을 느끼는 여유로운 코스',
+                        '3시간 코스',
+                        'https://picsum.photos/300/200?random=12',
+                        4.5,
+                        '2', // 임시 ID
+                      ),
+                      _buildWeatherBasedTripCard(
+                        context,
+                        '한강 자전거 투어',
+                        '한강을 따라 자전거를 타며 즐기는 코스',
+                        '5시간 코스',
+                        'https://picsum.photos/300/200?random=13',
+                        4.8,
+                        '3', // 임시 ID
+                      ),
+                      _buildWeatherBasedTripCard(
+                        context,
+                        '남산 둘레길 코스',
+                        '서울 시내를 내려다보며 걷는 트레킹 코스',
+                        '4시간 코스',
+                        'https://picsum.photos/300/200?random=14',
+                        4.6,
+                        '4', // 임시 ID
+                      ),
+                    ],
+                  ),
                 ),
-                delegate: SliverChildListDelegate([
-                  TripTypeCard(
-                    type: TripType.solo,
-                    title: '혼자서',
-                    imagePath: 'https://picsum.photos/400/300?random=2',
+              ),
+            ),
+
+            // 테마별 추천 여행 섹션
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 30, 20, 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 5,
+                          height: 25,
+                          decoration: BoxDecoration(
+                            color: Theme
+                                .of(context)
+                                .primaryColor,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '테마별 추천 여행',
+                          style: Theme
+                              .of(context)
+                              .textTheme
+                              .titleLarge
+                              ?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      '당신의 취향에 맞는 테마별 여행 코스를 찾아보세요',
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // 테마 필터 버튼
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0, vertical: 8.0),
+                child: SizedBox(
+                  height: 40,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: themes.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _selectedThemeIndex = index;
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _selectedThemeIndex == index
+                                ? Theme
+                                .of(context)
+                                .primaryColor
+                                : Colors.white,
+                            foregroundColor: _selectedThemeIndex == index
+                                ? Colors.white
+                                : Colors.black87,
+                            elevation: _selectedThemeIndex == index ? 2 : 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              side: BorderSide(
+                                color: _selectedThemeIndex == index
+                                    ? Theme
+                                    .of(context)
+                                    .primaryColor
+                                    : Colors.grey[300]!,
+                              ),
+                            ),
+                          ),
+                          child: Text(themes[index]),
+                        ),
+                      );
+                    },
                   ),
-                  TripTypeCard(
-                    type: TripType.couple,
-                    title: '연인과',
-                    imagePath: 'https://picsum.photos/400/300?random=3',
-                  ),
-                  TripTypeCard(
-                    type: TripType.family,
-                    title: '가족과',
-                    imagePath: 'https://picsum.photos/400/300?random=4',
-                  ),
-                  TripTypeCard(
-                    type: TripType.friends,
-                    title: '친구와',
-                    imagePath: 'https://picsum.photos/400/300?random=5',
-                  ),
-                ]),
+                ),
+              ),
+            ),
+
+            // 테마별 추천 여행 목록
+            SliverPadding(
+              padding: const EdgeInsets.all(16.0),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  children: [
+                    _buildThemeBasedTripCard(
+                      context,
+                      'https://picsum.photos/1000/600?random=15',
+                      '제주 힐링 여행',
+                      '제주의 자연과 함께하는 힐링 코스',
+                      '2박 3일 코스',
+                      4.9,
+                      '5', // 임시 ID
+                    ),
+                    const SizedBox(height: 16),
+                    _buildThemeBasedTripCard(
+                      context,
+                      'https://picsum.photos/1000/600?random=16',
+                      '부산 맛집 투어',
+                      '부산의 대표 맛집을 탐험하는 미식 코스',
+                      '당일 코스',
+                      4.7,
+                      '6', // 임시 ID
+                    ),
+                  ],
+                ),
               ),
             ),
 
             // 인기 여행지 섹션
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 30, 20, 10),
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -171,16 +345,22 @@ class HomeScreen extends StatelessWidget {
                               width: 5,
                               height: 25,
                               decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor,
+                                color: Theme
+                                    .of(context)
+                                    .primaryColor,
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
                             const SizedBox(width: 10),
                             Text(
                               '인기 여행지',
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              style: Theme
+                                  .of(context)
+                                  .textTheme
+                                  .titleLarge
+                                  ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
@@ -193,13 +373,17 @@ class HomeScreen extends StatelessWidget {
                               Text(
                                 '더보기',
                                 style: TextStyle(
-                                  color: Theme.of(context).primaryColor,
+                                  color: Theme
+                                      .of(context)
+                                      .primaryColor,
                                 ),
                               ),
                               Icon(
                                 Icons.arrow_forward_ios,
                                 size: 14,
-                                color: Theme.of(context).primaryColor,
+                                color: Theme
+                                    .of(context)
+                                    .primaryColor,
                               ),
                             ],
                           ),
@@ -208,9 +392,13 @@ class HomeScreen extends StatelessWidget {
                     ),
                     Text(
                       '지금 가장 많이 찾는 인기 여행지에요',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
-                          ),
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(
+                        color: Colors.grey[600],
+                      ),
                     ),
                   ],
                 ),
@@ -256,65 +444,176 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
 
-            // 추천 여행 코스 섹션
-            /*SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 30, 20, 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 5,
-                          height: 25,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          '이달의 추천 여행',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      '지금 계절에 딱 맞는 추천 여행 코스',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
-                          ),
-                    ),
-                    const SizedBox(height: 15),
-                    _buildRecommendedTripCard(
-                      context,
-                      'https://picsum.photos/1000/600?random=10',
-                      '봄 벚꽃 여행',
-                      '서울 벚꽃 명소 3곳 데이트 코스',
-                      '4시간 코스',
-                      4.8,
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-              ),
-            ),
-
             // 하단 여백
             const SliverToBoxAdapter(
               child: SizedBox(height: 40),
-            ),*/
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildPopularDestinationCard(
-      BuildContext context, String imageUrl, String name, String description) {
+  // 날씨 아이콘 반환 메서드
+  Widget _getWeatherIcon(String weather) {
+    IconData iconData;
+    Color iconColor;
+
+    switch (weather) {
+      case '맑음':
+        iconData = Icons.wb_sunny;
+        iconColor = Colors.amber;
+        break;
+      case '흐림':
+        iconData = Icons.cloud;
+        iconColor = Colors.grey;
+        break;
+      case '비':
+        iconData = Icons.beach_access; // 우산 아이콘
+        iconColor = Colors.blue;
+        break;
+      case '눈':
+        iconData = Icons.ac_unit;
+        iconColor = Colors.lightBlue;
+        break;
+      default:
+        iconData = Icons.wb_sunny;
+        iconColor = Colors.amber;
+    }
+
+    return Icon(
+      iconData,
+      color: iconColor,
+      size: 24,
+    );
+  }
+
+  // 날씨 기반 추천 여행 카드
+  Widget _buildWeatherBasedTripCard(BuildContext context, String title,
+      String description, String duration,
+      String imageUrl, double rating, String tripId) {
+    return Container(
+      width: 250,
+      margin: const EdgeInsets.only(right: 16, bottom: 10),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TripDetailScreen(tripId: tripId),
+            ),
+          );
+        },
+        child: Card(
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          elevation: 4,
+          shadowColor: Colors.black26,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Stack(
+                children: [
+                  Image.network(
+                    imageUrl,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: 100,
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.star,
+                            color: Colors.amber,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            rating.toString(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      description,
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(
+                        color: Colors.grey[600],
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.access_time,
+                          size: 14,
+                          color: Colors.grey[600],
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          duration,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPopularDestinationCard(BuildContext context, String imageUrl,
+      String name, String description) {
     return Container(
       width: 180,
       margin: const EdgeInsets.only(right: 16, bottom: 10),
@@ -341,7 +640,8 @@ class HomeScreen extends StatelessWidget {
                     top: 8,
                     right: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: Colors.black.withOpacity(0.6),
                         borderRadius: BorderRadius.circular(12),
@@ -376,16 +676,24 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   Text(
                     name,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                    style: Theme
+                        .of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     description,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.grey[600],
-                        ),
+                    style: Theme
+                        .of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(
+                      color: Colors.grey[600],
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -398,153 +706,163 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRecommendedTripCard(
-    BuildContext context,
-    String imageUrl,
-    String title,
-    String description,
-    String duration,
-    double rating,
-  ) {
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      elevation: 5,
-      shadowColor: Colors.black26,
-      child: Column(
-        children: [
-          // 이미지와 제목 오버레이
-          Stack(
-            children: [
-              Image.network(
-                imageUrl,
-                height: 180,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.8),
+  Widget _buildThemeBasedTripCard(BuildContext context,
+      String imageUrl,
+      String title,
+      String description,
+      String duration,
+      double rating,
+      String tripId,) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TripDetailScreen(tripId: tripId),
+          ),
+        );
+      },
+      child: Card(
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        elevation: 5,
+        shadowColor: Colors.black26,
+        child: Column(
+          children: [
+            // 이미지와 제목 오버레이
+            Stack(
+              children: [
+                Image.network(
+                  imageUrl,
+                  height: 180,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 15),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.8),
+                        ],
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          description,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                ),
+                // 즐겨찾기 버튼
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        description,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.favorite_border),
+                      color: Colors.red,
+                      onPressed: () {
+                        // 즐겨찾기 추가 기능 (나중에 구현)
+                      },
+                    ),
                   ),
-                ),
-              ),
-              // 즐겨찾기 버튼
-              Positioned(
-                top: 10,
-                right: 10,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.favorite_border),
-                    color: Colors.red,
-                    onPressed: () {
-                      // 즐겨찾기 추가 기능 (나중에 구현)
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-          // 하단 정보
-          Padding(
-            padding: const EdgeInsets.all(15),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // 소요 시간
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.access_time,
-                      size: 20,
-                      color: Colors.grey,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      duration,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-                  ],
-                ),
-                // 평점
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.star,
-                      size: 20,
-                      color: Colors.amber,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      rating.toString(),
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[800],
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      '(120)',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),
-          ),
-        ],
+            // 하단 정보
+            Padding(
+              padding: const EdgeInsets.all(15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // 소요 시간
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.access_time,
+                        size: 20,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        duration,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                    ],
+                  ),
+                  // 평점
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.star,
+                        size: 20,
+                        color: Colors.amber,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        rating.toString(),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        '(120)',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
