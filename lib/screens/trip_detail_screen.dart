@@ -5,6 +5,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../models/trip.dart';
 import '../providers/trip_provider.dart';
+import '../providers/auth_provider.dart';
 
 class TripDetailScreen extends StatefulWidget {
   final String tripId;
@@ -19,10 +20,11 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // 화면이 처음 로드될 때 여행 상세 정보 가져오기
-    Future.microtask(() =>
-        Provider.of<TripProvider>(context, listen: false)
-            .fetchTripDetail(widget.tripId));
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final tripProvider = Provider.of<TripProvider>(context, listen: false);
+      await tripProvider.fetchTripDetail(widget.tripId);
+      await tripProvider.fetchTripPlan(widget.tripId); // fetch recommended course
+    });
   }
 
   @override
@@ -38,6 +40,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
             return const Center(child: Text('여행 정보를 찾을 수 없습니다.'));
           } else {
             final trip = tripProvider.selectedTrip!;
+            final tripPlan = tripProvider.tripPlan;
             return CustomScrollView(
               slivers: [
                 // 앱바
@@ -122,7 +125,29 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                           trip.description,
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
-                        const SizedBox(height: 24),
+                        if (tripPlan != null) ...[
+                          const SizedBox(height: 24),
+                          Text('추천 장소', style: Theme.of(context).textTheme.titleLarge),
+                          const SizedBox(height: 8),
+                          Column(
+                            children: (tripPlan['course'] as List<dynamic>).map((place) {
+                              return Card(
+                                margin: const EdgeInsets.symmetric(vertical: 6),
+                                child: ListTile(
+                                  leading: Icon(place['type'] == '카페'
+                                      ? Icons.local_cafe
+                                      : Icons.restaurant),
+                                  title: Text(place['name']),
+                                  subtitle: Text(
+                                      '평점 ${place['rating']} / 주차: ${place['parking'] == true ? '가능' : '불가'}'),
+                                  trailing: place['instagram_hot'] == true
+                                      ? const Icon(Icons.whatshot, color: Colors.red)
+                                      : null,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
                         // 명소 목록
                         Text(
                           '방문 명소',
@@ -198,53 +223,37 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          // 여행 계획 저장 기능 (나중에 구현)
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('여행 코스가 저장되었습니다.')),
+      floatingActionButton: Consumer<TripProvider>(
+        builder: (ctx, provider, _) {
+          return FloatingActionButton.extended(
+            onPressed: () async {
+              final authProvider = Provider.of<AuthProvider>(context, listen: false);
+              if (!authProvider.isLoggedIn) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('로그인이 필요합니다.')),
+                );
+                return;
+              }
+
+              final success = await provider.toggleFavorite(widget.tripId);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(success ? '저장되었습니다.' : '저장 실패'),
+                  ),
+                );
+              }
+            },
+            label: const Text('저장하기'),
+            icon: const Icon(Icons.favorite_border), // 또는 상태에 따라 변경 가능
           );
         },
-        label: const Text('저장하기'),
-        icon: const Icon(Icons.favorite),
       ),
     );
   }
 
   Widget _buildMap(Trip trip) {
-    if (trip.attractions.isEmpty) {
-      return const Center(child: Text('경로 정보가 없습니다.'));
-    }
-
-    // 모든 관광지 좌표에서 중심점 계산
-    double avgLat = trip.attractions.map((a) => a.latitude).reduce((a, b) => a + b) / trip.attractions.length;
-    double avgLng = trip.attractions.map((a) => a.longitude).reduce((a, b) => a + b) / trip.attractions.length;
-
-    // 지도 초기 카메라 위치
-    final CameraPosition initialPosition = CameraPosition(
-      target: LatLng(avgLat, avgLng),
-      zoom: 12,
-    );
-
-    // 관광지 마커 생성
-    final Set<Marker> markers = trip.attractions.map((attraction) {
-      return Marker(
-        markerId: MarkerId(attraction.id),
-        position: LatLng(attraction.latitude, attraction.longitude),
-        infoWindow: InfoWindow(
-          title: attraction.name,
-          snippet: '${attraction.visitDuration}분 소요',
-        ),
-      );
-    }).toSet();
-
-    return GoogleMap(
-      initialCameraPosition: initialPosition,
-      markers: markers,
-      myLocationEnabled: false,
-      zoomControlsEnabled: false,
-      mapToolbarEnabled: false,
-    );
+    return const Center(child: Text('카카오맵 경로 표시 예정'));
   }
 
   Color _getTypeColor(TripType type) {

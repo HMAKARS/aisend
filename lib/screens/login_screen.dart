@@ -170,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
 
                 const SizedBox(height: 50),
 
-/*
+
                 // 로그인 폼
                 _emailLogin
                 ? FadeTransition(
@@ -357,7 +357,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                   ),
 
                 const SizedBox(height: 32),
-*/
+
 
                 // 소셜 로그인 버튼들
                 Column(

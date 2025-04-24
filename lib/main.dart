@@ -7,6 +7,7 @@ import 'screens/profile_screen.dart';
 import 'screens/kakao_map_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
+import 'screens/myTravel_screen.dart';
 import 'providers/trip_provider.dart';
 import 'providers/auth_provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -59,12 +60,7 @@ class AuthCheckScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     
-    // 로그인 상태를 백그라운드에서 확인하지만 항상 메인 화면으로 이동
-    authProvider.checkLoginStatus();
-    return const MainScreen();
-    
-    // 기존 로그인 체크 로직 (주석 처리)
-    /*
+    // 로그인 상태를 확인하여 적절한 화면으로 이동
     return FutureBuilder(
       future: authProvider.checkLoginStatus(),
       builder: (context, snapshot) {
@@ -77,15 +73,14 @@ class AuthCheckScreen extends StatelessWidget {
         }
         
         // 로그인 상태에 따라 시작 화면 결정
-        final isLoggedIn = snapshot.data ?? false;
-        if (isLoggedIn) {
+        //final isLoggedIn = snapshot.data ?? false;
+        //if (isLoggedIn) {
           return const MainScreen();
-        } else {
-          return const LoginScreen();
-        }
+        //} else {
+          //return const LoginScreen();
+        //}
       },
     );
-    */
   }
 }
 
@@ -103,6 +98,7 @@ class _MainScreenState extends State<MainScreen> {
     const SearchScreen(),
     const KakaoMapScreen(),
     const HomeScreen(),
+    const myTravelScreen(),
     const ProfileScreen(),
   ];
 
@@ -134,16 +130,20 @@ class _MainScreenState extends State<MainScreen> {
           backgroundColor: Colors.white,
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(Icons.search),
+              icon: Icon(Icons.search_rounded),
               label: '검색',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.near_me_outlined),
-              label: '내주변',
+              label: '내 주변',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.home_outlined),
               label: '홈',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.star_border),
+              label: '내 여행',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person_outline),

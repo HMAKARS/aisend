@@ -18,10 +18,12 @@ class _TripListScreenState extends State<TripListScreen> {
   @override
   void initState() {
     super.initState();
-    // 화면이 처음 로드될 때 여행 목록 가져오기
-    Future.microtask(() =>
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
         Provider.of<TripProvider>(context, listen: false)
-            .fetchTripsByType(widget.tripType));
+            .fetchTripsByType(widget.tripType);
+      }
+    });
   }
 
   @override
@@ -44,6 +46,9 @@ class _TripListScreenState extends State<TripListScreen> {
               itemCount: tripProvider.trips.length,
               itemBuilder: (ctx, index) {
                 final trip = tripProvider.trips[index];
+                // Ensure correct field names for Trip model
+                // trip.parkingAvailable -> trip.parking_available
+                // trip.instagramHotspot -> trip.instagram_hotspot
                 return TripCard(
                   trip: trip,
                   onTap: () {

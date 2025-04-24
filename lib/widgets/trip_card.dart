@@ -32,6 +32,32 @@ class TripCard extends StatelessWidget {
               child: Image.network(
                 trip.imageUrl,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  // 이미지 로드 오류 시 플레이스홀더 표시
+                  return Container(
+                    color: Colors.grey[200],
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.image_not_supported,
+                            color: Colors.grey[400],
+                            size: 36,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '이미지를 불러올 수 없습니다',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
             Padding(
