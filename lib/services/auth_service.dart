@@ -6,13 +6,13 @@ import '../config/config.dart';
 
 class AuthService {
   // 환경 변수에서 URL 가져오기
-  final String baseUrl = AppConfig.authBaseUrl;
+  final String baseUrl = Config.authBaseUrl;
   
   // 로그인
   Future<User> login(String email, String password) async {
     try {
       final response = await http.post(
-        Uri.parse(AppConfig.loginEndpoint),
+        Uri.parse(Config.loginEndpoint),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'username': email,  // Django auth는 일반적으로 username 필드 사용
@@ -53,7 +53,7 @@ class AuthService {
   Future<User> _getUserInfo(String token) async {
     try {
       final response = await http.get(
-        Uri.parse(AppConfig.userInfoEndpoint),
+        Uri.parse(Config.userInfoEndpoint),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Token $token',  // dj-rest-auth는 기본적으로 Token 인증 사용
@@ -79,7 +79,7 @@ class AuthService {
       return User(
         id: '1',
         name: '테스트 사용자',
-        email: AppConfig.defaultTestEmail,
+        email: Config.defaultTestEmail,
         profileImage: 'https://via.placeholder.com/150',
       );
     }
@@ -89,7 +89,7 @@ class AuthService {
   Future<User> signUp(String name, String email, String password) async {
     try {
       final response = await http.post(
-        Uri.parse(AppConfig.registerEndpoint),
+        Uri.parse(Config.registerEndpoint),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'username': email,
@@ -146,7 +146,7 @@ class AuthService {
       
       if (token != null) {
         await http.post(
-          Uri.parse(AppConfig.logoutEndpoint),
+          Uri.parse(Config.logoutEndpoint),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Token $token',
@@ -200,7 +200,7 @@ class AuthService {
     // 토큰 유효성 검사 (선택적)
     try {
       final response = await http.get(
-        Uri.parse(AppConfig.userInfoEndpoint),
+        Uri.parse(Config.userInfoEndpoint),
         headers: {
           'Authorization': 'Token $token',
         },

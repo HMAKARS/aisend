@@ -26,7 +26,7 @@ class _KakaoMapScreenState extends State<KakaoMapScreen> {
   
   // 환경 변수에서 API 키 가져오기
   void _initApiKey() {
-    kakaoMapApiKey = AppConfig.kakaoMapApiKey;
+    kakaoMapApiKey = Config.kakaoMapApiKey;
   }
 
   @override

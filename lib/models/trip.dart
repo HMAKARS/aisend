@@ -9,6 +9,12 @@ class Trip {
   final TripType type;
   final List<Attraction> attractions;
 
+  // 추가 필드
+  final bool isDriveCourse;
+  final bool isNoKidsZone;
+  final bool isKidsZone;
+  final bool isPetZone;
+
   Trip({
     required this.id,
     required this.title,
@@ -19,11 +25,15 @@ class Trip {
     required this.rating,
     required this.type,
     required this.attractions,
+    this.isDriveCourse = false,
+    this.isNoKidsZone = false,
+    this.isKidsZone = false,
+    this.isPetZone = false,
   });
 
   factory Trip.fromJson(Map<String, dynamic> json) {
     return Trip(
-      id: json['id'],
+      id: json['id'].toString(),
       title: json['title'],
       description: json['description'],
       imageUrl: json['imageUrl'],
@@ -31,9 +41,14 @@ class Trip {
       duration: json['duration'],
       rating: json['rating'].toDouble(),
       type: TripTypeExtension.fromString(json['type']),
-      attractions: (json['attractions'] as List)
-          .map((item) => Attraction.fromJson(item))
-          .toList(),
+      attractions: (json['attractions'] as List?)
+          ?.map((item) => Attraction.fromJson(item))
+          .toList() ?? [],
+      // 추가 필드 매핑
+      isDriveCourse: json['is_drive_course'] ?? false,
+      isNoKidsZone: json['is_no_kids_zone'] ?? false,
+      isKidsZone: json['is_kids_zone'] ?? false,
+      isPetZone: json['is_pet_zone'] ?? false,
     );
   }
 }

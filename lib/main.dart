@@ -10,8 +10,11 @@ import 'screens/signup_screen.dart';
 import 'screens/myTravel_screen.dart';
 import 'providers/trip_provider.dart';
 import 'providers/auth_provider.dart';
+import 'providers/place_provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:kakao_map_plugin/kakao_map_plugin.dart';
+import 'config/config.dart';
 
 
 Future<void> main() async {
@@ -20,7 +23,9 @@ Future<void> main() async {
   
   // .env 파일 로드
   await dotenv.load(fileName: '.env');
-  
+  AuthRepository.initialize(appKey: Config.kakaoNativeApiKey);
+  //KakaoMapSDK.instance.initialize(appKey: Config.kakaoNativeApiKey); // ✅ 초기화
+
   runApp(const MyApp());
 }
 
@@ -33,6 +38,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (ctx) => AuthProvider()),
         ChangeNotifierProvider(create: (ctx) => TripProvider()),
+        ChangeNotifierProvider(create: (ctx) => PlaceProvider()),
       ],
       child: MaterialApp(
         title: 'AISEND',

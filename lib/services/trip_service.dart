@@ -5,7 +5,7 @@ import '../config/config.dart';
 
 class TripService {
   // 환경 변수에서 URL 가져오기
-  final String baseUrl = AppConfig.tripsBaseUrl;
+  final String baseUrl = Config.tripsBaseUrl;
   
   // 여행 타입별 목록 가져오기
   Future<List<Trip>> getTripsByType(TripType type) async {

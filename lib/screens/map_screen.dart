@@ -6,8 +6,17 @@ import '../services/trip_service.dart';
 
 class MapScreen extends StatefulWidget {
   final List<Attraction>? attractions;
+  final double? initialLatitude;
+  final double? initialLongitude;
+  final String? title;
 
-  const MapScreen({super.key, this.attractions});
+  const MapScreen({
+    super.key, 
+    this.attractions,
+    this.initialLatitude,
+    this.initialLongitude,
+    this.title,
+  });
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -121,19 +130,34 @@ class _MapScreenState extends State<MapScreen> {
       );
     }
 
-    // 모든 관광지 좌표에서 중심점 계산
-    final avgLat = _attractions.map((a) => a.latitude).reduce((a, b) => a + b) / _attractions.length;
-    final avgLng = _attractions.map((a) => a.longitude).reduce((a, b) => a + b) / _attractions.length;
-
     // 지도 초기 카메라 위치
-    final CameraPosition initialPosition = CameraPosition(
-      target: LatLng(avgLat, avgLng),
-      zoom: 12,
-    );
+    final CameraPosition initialPosition;
+    
+    if (widget.initialLatitude != null && widget.initialLongitude != null) {
+      // 특정 위치가 제공된 경우
+      initialPosition = CameraPosition(
+        target: LatLng(widget.initialLatitude!, widget.initialLongitude!),
+        zoom: 15, // 좀 더 가깝게 줌
+      );
+    } else if (_attractions.isNotEmpty) {
+      // 관광지 목록이 있는 경우 중심점 계산
+      final avgLat = _attractions.map((a) => a.latitude).reduce((a, b) => a + b) / _attractions.length;
+      final avgLng = _attractions.map((a) => a.longitude).reduce((a, b) => a + b) / _attractions.length;
+      initialPosition = CameraPosition(
+        target: LatLng(avgLat, avgLng),
+        zoom: 12,
+      );
+    } else {
+      // 기본값 (서울 시청)
+      initialPosition = const CameraPosition(
+        target: LatLng(37.5665, 126.9780),
+        zoom: 12,
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('내 주변'),
+        title: Text(widget.title ?? '내 주변'),
       ),
       body: Stack(
         children: [
