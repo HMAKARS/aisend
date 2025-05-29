@@ -6,6 +6,13 @@ AISEND는 사용자 맞춤형 여행 계획을 자동으로 생성해주는 인�
 - 다양한 여행 스타일과 선호도를 가진 사용자 (혼자, 연인, 가족, 친구)
 - 효율적인 여행 동선과 시간 관리를 원하는 여행자
 
+프로젝트 구조
+ - /Users/hongbookpro/Desktop/DEV/aisend/aisend_app - 플러터프로젝트 디렉토리
+ - /Users/hongbookpro/Desktop/DEV/aisend/aisend_backend - django backend 디렉토리
+ - /Users/hongbookpro/Desktop/DEV/aisend/aisend_tour_data - dajngo 공공데이터모으기용 디렉토리
+ - 실질적으로 aisend_app과 aisend_backend 의 프로젝트가 중심이고, asiend_tour_data는 별개의 프로젝트라 보면 됨.
+ - asiend_backend 디렉토리 내부에 있는 attraction app은 지금은 사용되지 않으므로 삭제해도 무관.
+
 핵심 기능(Core Features)
 1. 카카오맵 API 기반 위치 서비스 (최우선순위)
 
